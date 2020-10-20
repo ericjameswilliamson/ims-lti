@@ -69,8 +69,17 @@ class HMAC_SHA1
       protocol = (encrypted and 'https') or 'http'
     
     parsedUrl  = url.parse originalUrl, true
-    hitUrl     = protocol + '://' + req.headers.host + parsedUrl.pathname
-
+    
+    if (process.env.NODE_ENV == 'production') {
+      if (process.env.AWS_ENV === 'production') {
+        hitUrl = 'https' + '://' + req.headers.host + parsedUrl.pathname;
+      } else {
+        hitUrl = 'http' + '://' + req.headers.host + parsedUrl.pathname;
+      }
+    } else {
+      hitUrl = protocol + '://' + req.headers.host + parsedUrl.pathname;
+    }    
+    
     @build_signature_raw hitUrl, parsedUrl, req.method, body, consumer_secret, token
 
   sign_string: (str, key, token) ->
